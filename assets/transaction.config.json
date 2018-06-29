@@ -1,0 +1,13 @@
+{
+    "gitlab": "http://gitlab.meizu.com",
+    "project_id": 51,
+    "branch": "master",
+    "appid": "25ab2f302bbc0818899d115c134a898c72eec4641934209ab764f1d5706a3f2a",
+    "appsecret": "34ccdb7da55c599c3df2ec22b8235ecb423c70f366cb8b0f2a93f49efaf32cff",
+    "callback_url": "http://duanqz.github.io/automerger",
+    "api": {
+        "version": "api/v4",
+        "files": "repository/files",
+        "tree": "repository/tree"
+    }
+}
