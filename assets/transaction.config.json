@@ -2,9 +2,9 @@
     "gitlab": "http://gitlab.meizu.com",
     "project_id": 51,
     "branch": "master",
-    "appid": "25ab2f302bbc0818899d115c134a898c72eec4641934209ab764f1d5706a3f2a",
-    "appsecret": "34ccdb7da55c599c3df2ec22b8235ecb423c70f366cb8b0f2a93f49efaf32cff",
-    "callback_url": "http://duanqz.github.io/automerger",
+    "appid": "dace194f1483018f33666183fa2390e5bbe6a15969d6478b2d55e1c62d2cdf4e",
+    "appsecret": "111df0930bbfd98c4efbce1a8c1cc1e688a04295013991556854d2e7f6dde102",
+    "callback_url": "http://www.nullpointer.ltd/branch-topology/",
     "api": {
         "version": "api/v4",
         "files": "repository/files",
