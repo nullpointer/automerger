@@ -3080,9 +3080,17 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var LoginComponent = /** @class */ (function () {
     function LoginComponent(transactionService) {
         this.transactionService = transactionService;
+        var code = this.getAuthorizeCode();
+        if (code) {
+        }
+        console.log(window.location.href);
     }
     LoginComponent.prototype.authorize = function () {
         window.location.href = this.transactionService.getOauthAuthorizeUrl();
+    };
+    LoginComponent.prototype.getAuthorizeCode = function () {
+        var parameters = new URLSearchParams(window.location.search);
+        return parameters.get('access_token');
     };
     LoginComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -3255,6 +3263,20 @@ var TransactionService = /** @class */ (function () {
     TransactionService.prototype.getOauthAuthorizeUrl = function () {
         return this.transactionConfig.oauthAuthorize;
     };
+    // public getAccessToken(code, redirect_uri) {
+    //     const body = {
+    //         'client_id': this.transactionConfig.appId,
+    //         'client_secret': this.transactionConfig.appSecret,
+    //         'code': code,
+    //         'grant_type': 'authorization_code',
+    //         'redirect_uri': redirect_uri, 
+    //     }
+    //     return this.http.post(this.transactionConfig.oauthToken, body).toPromise();
+    // }
+    TransactionService.prototype.getUser = function (accessToken) {
+        var url = this.urljoin(this.transactionConfig.apiUser, "?access_token=" + accessToken);
+        return this.http.get(url);
+    };
     TransactionService.prototype.loadConfig = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -3279,9 +3301,10 @@ var TransactionService = /** @class */ (function () {
                                     callbackUrl: data['callback_url'] || '',
                                 };
                                 config.oauthToken = _this.urljoin(config.gitlab, 'oauth/token');
-                                config.oauthAuthorize = _this.urljoin(config.gitlab, 'oauth/authorize', '?client_id=' + config.appId, '&client_secret=' + config.appSecret, '&redirect_uri=' + config.callbackUrl, '&response_type=code');
+                                config.oauthAuthorize = _this.urljoin(config.gitlab, 'oauth/authorize', '?client_id=' + config.appId, '&client_secret=' + config.appSecret, '&redirect_uri=' + config.callbackUrl, '&response_type=token');
                                 // APIs
                                 config.api = _this.urljoin(config.gitlab, data['api']['version']);
+                                config.apiUser = _this.urljoin(config.api, data['api']['user']);
                                 config.apiFiles = _this.urljoin(config.api, 'projects', config.projectId, data['api']['files']);
                                 config.apiTree = _this.urljoin(config.api, 'projects', config.projectId, data['api']['tree']);
                                 return Promise.resolve(config);

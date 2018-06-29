@@ -7,6 +7,7 @@
     "callback_url": "http://www.nullpointer.ltd/branch-topology/",
     "api": {
         "version": "api/v4",
+        "user": "user",
         "files": "repository/files",
         "tree": "repository/tree"
     }
