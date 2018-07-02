@@ -2910,6 +2910,138 @@ var AppComponent = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/app/app.config.ts":
+/*!*******************************!*\
+  !*** ./src/app/app.config.ts ***!
+  \*******************************/
+/*! exports provided: AppConfig, urljoin */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppConfig", function() { return AppConfig; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "urljoin", function() { return urljoin; });
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _global_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./global.state */ "./src/app/global.state.ts");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var AppConfig = /** @class */ (function () {
+    function AppConfig(http, state) {
+        this.http = http;
+        this.state = state;
+        console.info('Load AppConfig');
+        this.loadConfig();
+    }
+    AppConfig_1 = AppConfig;
+    AppConfig.prototype.getTransactionConfig = function () {
+        return this.transactionConfig;
+    };
+    AppConfig.prototype.registerOnAppConfigLoaded = function (callback) {
+        if (typeof callback === 'function') {
+            this.state.subscribe(AppConfig_1.ON_APPCONFIG_LOADED, callback);
+        }
+    };
+    AppConfig.prototype.loadConfig = function () {
+        var _this = this;
+        // TransactionConfig
+        this.http.get(AppConfig_1.CONFIG_JSON).subscribe(function (data) {
+            var config = {
+                // Basic
+                gitlab: String(data['gitlab']) || '',
+                projectId: String(data['project_id']) || '',
+                branch: data['branch'] || '',
+                // Oauth
+                appId: data['appid'] || '',
+                appSecret: data['appsecret'] || '',
+                callbackUrl: data['callback_url'] || '',
+            };
+            // Get the access_token by this url
+            config.oauthAuthorize = urljoin(config.gitlab, 'oauth/authorize', '?client_id=' + config.appId, '&client_secret=' + config.appSecret, '&redirect_uri=' + config.callbackUrl, '&response_type=token');
+            // APIs. All APIs needs access_token
+            config.api = urljoin(config.gitlab, data['api']['version']);
+            config.apiUser = urljoin(config.api, data['api']['user']);
+            config.apiFiles = urljoin(config.api, 'projects', config.projectId, data['api']['files']);
+            config.apiTree = urljoin(config.api, 'projects', config.projectId, data['api']['tree']);
+            _this.transactionConfig = config;
+            _this.state.notifyDataChanged(AppConfig_1.ON_APPCONFIG_LOADED, true);
+        });
+    };
+    AppConfig.CONFIG_JSON = 'assets/transaction.config.json';
+    AppConfig.ON_APPCONFIG_LOADED = 'onAppConfigLoaded';
+    AppConfig = AppConfig_1 = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])(),
+        __metadata("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpClient"], _global_state__WEBPACK_IMPORTED_MODULE_2__["GlobalState"]])
+    ], AppConfig);
+    return AppConfig;
+    var AppConfig_1;
+}());
+
+;
+function urljoin() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    var strArray = [].slice.call(args);
+    var resultArray = [];
+    // If the first part is a plain protocol, we combine it with the next part.
+    if (strArray[0].match(/^[^/:]+:\/*$/) && strArray.length > 1) {
+        var first = strArray.shift();
+        strArray[0] = first + strArray[0];
+    }
+    // There must be two or three slashes in the file protocol, two slashes in anything else.
+    if (strArray[0].match(/^file:\/\/\//)) {
+        strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1:///');
+    }
+    else {
+        strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1://');
+    }
+    for (var i = 0; i < strArray.length; i++) {
+        var component = strArray[i];
+        if (typeof component !== 'string') {
+            throw new TypeError('Url must be a string. Received ' + component);
+        }
+        if (component === '') {
+            continue;
+        }
+        if (i > 0) {
+            // Removing the starting slashes for each component but the first.
+            component = component.replace(/^[\/]+/, '');
+        }
+        if (i < strArray.length - 1) {
+            // Removing the ending slashes for each component but the last.
+            component = component.replace(/[\/]+$/, '');
+        }
+        else {
+            // For the last component we will combine multiple slashes to a single one.
+            component = component.replace(/[\/]+$/, '/');
+        }
+        resultArray.push(component);
+    }
+    var str = resultArray.join('/');
+    // Each input component is now separated by a single slash except the possible first plain protocol part.
+    // remove trailing slash before parameters or hash
+    str = str.replace(/\/(\?|&|#[^!])/g, '$1');
+    // replace ? in parameters with &
+    var parts = str.split('?');
+    str = parts.shift() + (parts.length > 0 ? '?' : '') + parts.join('&');
+    return str;
+}
+
+
+/***/ }),
+
 /***/ "./src/app/app.module.ts":
 /*!*******************************!*\
   !*** ./src/app/app.module.ts ***!
@@ -2932,6 +3064,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ng_bootstrap_ng_bootstrap__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ng-bootstrap/ng-bootstrap */ "./node_modules/@ng-bootstrap/ng-bootstrap/index.js");
 /* harmony import */ var _auth_guard__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./auth.guard */ "./src/app/auth.guard.ts");
 /* harmony import */ var _pages_login_login_module__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./pages/login/login.module */ "./src/app/pages/login/login.module.ts");
+/* harmony import */ var _transaction_transaction_module__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./transaction/transaction.module */ "./src/app/transaction/transaction.module.ts");
+/* harmony import */ var _app_config__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./app.config */ "./src/app/app.config.ts");
+/* harmony import */ var _global_state__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./global.state */ "./src/app/global.state.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2955,6 +3090,15 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 
 
 
+
+
+
+// Application wide providers
+var APP_PROVIDERS = [
+    _auth_guard__WEBPACK_IMPORTED_MODULE_10__["AuthGuard"],
+    _app_config__WEBPACK_IMPORTED_MODULE_13__["AppConfig"],
+    _global_state__WEBPACK_IMPORTED_MODULE_14__["GlobalState"],
+];
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -2967,6 +3111,7 @@ var AppModule = /** @class */ (function () {
                 _angular_common_http__WEBPACK_IMPORTED_MODULE_4__["HttpClientModule"],
                 _app_routing_module__WEBPACK_IMPORTED_MODULE_7__["AppRoutingModule"],
                 _pages_login_login_module__WEBPACK_IMPORTED_MODULE_11__["LoginModule"],
+                _transaction_transaction_module__WEBPACK_IMPORTED_MODULE_12__["TransactionModule"],
                 _ng_bootstrap_ng_bootstrap__WEBPACK_IMPORTED_MODULE_9__["NgbModule"].forRoot(),
                 _theme_theme_module__WEBPACK_IMPORTED_MODULE_8__["ThemeModule"].forRoot(),
                 _core_core_module__WEBPACK_IMPORTED_MODULE_5__["CoreModule"].forRoot(),
@@ -2974,7 +3119,7 @@ var AppModule = /** @class */ (function () {
             bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_6__["AppComponent"]],
             providers: [
                 { provide: _angular_common__WEBPACK_IMPORTED_MODULE_0__["APP_BASE_HREF"], useValue: '/' },
-                _auth_guard__WEBPACK_IMPORTED_MODULE_10__["AuthGuard"],
+                APP_PROVIDERS,
             ],
         })
     ], AppModule);
@@ -3018,14 +3163,97 @@ var AuthGuard = /** @class */ (function () {
             return true;
         }
         // not logged in so redirect to login page with the return url
-        this.router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+        var extras = {
+            queryParams: { return_url: state.url, access_token: this.getAccessToken() },
+        };
+        this.router.navigate(['/auth/login'], extras);
         return false;
+    };
+    AuthGuard.prototype.getAccessToken = function () {
+        // See https://docs.gitlab.com/ce/api/README.html to retrieve access_token
+        var hash = window.location.hash;
+        if (hash && hash.length > 0) {
+            var params = new URLSearchParams(hash.replace('#', '?'));
+            return params.get('access_token');
+        }
+        return '';
     };
     AuthGuard = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
         __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_1__["Router"]])
     ], AuthGuard);
     return AuthGuard;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/global.state.ts":
+/*!*********************************!*\
+  !*** ./src/app/global.state.ts ***!
+  \*********************************/
+/*! exports provided: GlobalState */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalState", function() { return GlobalState; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var rxjs_Subject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/Subject */ "./node_modules/rxjs-compat/_esm5/Subject.js");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var GlobalState = /** @class */ (function () {
+    function GlobalState() {
+        var _this = this;
+        this._data = new rxjs_Subject__WEBPACK_IMPORTED_MODULE_1__["Subject"]();
+        this._dataStream$ = this._data.asObservable();
+        this._subscriptions = new Map();
+        this._dataStream$.subscribe(function (data) { return _this._onEvent(data); });
+    }
+    GlobalState.prototype.notifyDataChanged = function (event, value) {
+        var current = this._data[event];
+        if (current !== value) {
+            this._data[event] = value;
+            this._data.next({
+                event: event,
+                data: this._data[event],
+            });
+        }
+    };
+    GlobalState.prototype.subscribe = function (event, callback) {
+        var subscribers = this._subscriptions.get(event) || [];
+        subscribers.push(callback);
+        this._subscriptions.set(event, subscribers);
+    };
+    GlobalState.prototype.unsubscribe = function (event, callback) {
+        var subscribers = this._subscriptions.get(event) || [];
+        var index = subscribers.indexOf(callback, 0);
+        if (index > -1) {
+            subscribers.splice(index, 1);
+        }
+        this._subscriptions.set(event, subscribers);
+    };
+    GlobalState.prototype._onEvent = function (data) {
+        var subscribers = this._subscriptions.get(data['event']) || [];
+        subscribers.forEach(function (callback) {
+            callback.call(null, data['data']);
+        });
+    };
+    GlobalState = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
+        __metadata("design:paramtypes", [])
+    ], GlobalState);
+    return GlobalState;
 }());
 
 
@@ -3066,6 +3294,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginComponent", function() { return LoginComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../transaction/transaction.service */ "./src/app/transaction/transaction.service.ts");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
+/* harmony import */ var _app_config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../app.config */ "./src/app/app.config.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3077,20 +3307,36 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 };
 
 
+
+
 var LoginComponent = /** @class */ (function () {
-    function LoginComponent(transactionService) {
+    function LoginComponent(config, route, router, transactionService) {
+        this.config = config;
+        this.route = route;
+        this.router = router;
         this.transactionService = transactionService;
-        var code = this.getAuthorizeCode();
-        if (code) {
-        }
-        console.log(window.location.href);
+        this.getUser();
     }
+    LoginComponent.prototype.getUser = function () {
+        var _this = this;
+        this.route.queryParams.subscribe(function (params) {
+            var accessToken = params['access_token'];
+            var returnUrl = params['return_url'];
+            if (accessToken && accessToken.length > 0) {
+                _this.config.registerOnAppConfigLoaded(function () {
+                    _this.transactionService.getUser(accessToken).subscribe(function (user) {
+                        if (user) {
+                            localStorage.setItem('access_token', accessToken);
+                            localStorage.setItem('currentUser', user['name']);
+                            _this.router.navigate([returnUrl]);
+                        }
+                    });
+                });
+            }
+        });
+    };
     LoginComponent.prototype.authorize = function () {
         window.location.href = this.transactionService.getOauthAuthorizeUrl();
-    };
-    LoginComponent.prototype.getAuthorizeCode = function () {
-        var parameters = new URLSearchParams(window.location.search);
-        return parameters.get('access_token');
     };
     LoginComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -3098,7 +3344,10 @@ var LoginComponent = /** @class */ (function () {
             styles: [__webpack_require__(/*! ./login.component.scss */ "./src/app/pages/login/login.component.scss")],
             template: __webpack_require__(/*! ./login.component.html */ "./src/app/pages/login/login.component.html"),
         }),
-        __metadata("design:paramtypes", [_transaction_transaction_service__WEBPACK_IMPORTED_MODULE_1__["TransactionService"]])
+        __metadata("design:paramtypes", [_app_config__WEBPACK_IMPORTED_MODULE_3__["AppConfig"],
+            _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"],
+            _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"],
+            _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_1__["TransactionService"]])
     ], LoginComponent);
     return LoginComponent;
 }());
@@ -3145,9 +3394,7 @@ var LoginModule = /** @class */ (function () {
             declarations: [
                 _login_component__WEBPACK_IMPORTED_MODULE_2__["LoginComponent"],
             ],
-            providers: [
-                _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_4__["TransactionService"],
-            ],
+            providers: [_transaction_transaction_service__WEBPACK_IMPORTED_MODULE_4__["TransactionService"]],
         })
     ], LoginModule);
     return LoginModule;
@@ -3205,8 +3452,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TransactionService", function() { return TransactionService; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
-/* harmony import */ var rxjs_add_operator_toPromise__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/add/operator/toPromise */ "./node_modules/rxjs-compat/_esm5/add/operator/toPromise.js");
-/* harmony import */ var rxjs_add_operator_toPromise__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(rxjs_add_operator_toPromise__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _app_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../app.config */ "./src/app/app.config.ts");
+/* harmony import */ var rxjs_add_operator_toPromise__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/add/operator/toPromise */ "./node_modules/rxjs-compat/_esm5/add/operator/toPromise.js");
+/* harmony import */ var rxjs_add_operator_toPromise__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(rxjs_add_operator_toPromise__WEBPACK_IMPORTED_MODULE_3__);
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3216,159 +3464,29 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
+
 
 
 
 var TransactionService = /** @class */ (function () {
-    function TransactionService(http) {
+    function TransactionService(config, http) {
+        var _this = this;
+        this.config = config;
         this.http = http;
-        this.CONFIG_JSON = 'assets/transaction.config.json';
-        this.loadConfig();
+        this.config.registerOnAppConfigLoaded(function () {
+            _this.transactionConfig = _this.config.getTransactionConfig();
+        });
     }
     TransactionService.prototype.getOauthAuthorizeUrl = function () {
         return this.transactionConfig.oauthAuthorize;
     };
-    // public getAccessToken(code, redirect_uri) {
-    //     const body = {
-    //         'client_id': this.transactionConfig.appId,
-    //         'client_secret': this.transactionConfig.appSecret,
-    //         'code': code,
-    //         'grant_type': 'authorization_code',
-    //         'redirect_uri': redirect_uri, 
-    //     }
-    //     return this.http.post(this.transactionConfig.oauthToken, body).toPromise();
-    // }
     TransactionService.prototype.getUser = function (accessToken) {
-        var url = this.urljoin(this.transactionConfig.apiUser, "?access_token=" + accessToken);
+        var url = Object(_app_config__WEBPACK_IMPORTED_MODULE_2__["urljoin"])(this.transactionConfig.apiUser, '?access_token=' + accessToken);
         return this.http.get(url);
-    };
-    TransactionService.prototype.loadConfig = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (typeof this.transactionConfig !== 'undefined') {
-                            Promise.resolve(this.transactionConfig);
-                        }
-                        _a = this;
-                        return [4 /*yield*/, this.http.get(this.CONFIG_JSON).toPromise()
-                                .then(function (data) {
-                                var config = {
-                                    // Basic
-                                    gitlab: String(data['gitlab']) || '',
-                                    projectId: String(data['project_id']) || '',
-                                    branch: data['branch'] || '',
-                                    // Oauth
-                                    appId: data['appid'] || '',
-                                    appSecret: data['appsecret'] || '',
-                                    callbackUrl: data['callback_url'] || '',
-                                };
-                                config.oauthToken = _this.urljoin(config.gitlab, 'oauth/token');
-                                config.oauthAuthorize = _this.urljoin(config.gitlab, 'oauth/authorize', '?client_id=' + config.appId, '&client_secret=' + config.appSecret, '&redirect_uri=' + config.callbackUrl, '&response_type=token');
-                                // APIs
-                                config.api = _this.urljoin(config.gitlab, data['api']['version']);
-                                config.apiUser = _this.urljoin(config.api, data['api']['user']);
-                                config.apiFiles = _this.urljoin(config.api, 'projects', config.projectId, data['api']['files']);
-                                config.apiTree = _this.urljoin(config.api, 'projects', config.projectId, data['api']['tree']);
-                                return Promise.resolve(config);
-                            })];
-                    case 1:
-                        _a.transactionConfig = _b.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    TransactionService.prototype.urljoin = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var strArray = [].slice.call(args);
-        var resultArray = [];
-        // If the first part is a plain protocol, we combine it with the next part.
-        if (strArray[0].match(/^[^/:]+:\/*$/) && strArray.length > 1) {
-            var first = strArray.shift();
-            strArray[0] = first + strArray[0];
-        }
-        // There must be two or three slashes in the file protocol, two slashes in anything else.
-        if (strArray[0].match(/^file:\/\/\//)) {
-            strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1:///');
-        }
-        else {
-            strArray[0] = strArray[0].replace(/^([^/:]+):\/*/, '$1://');
-        }
-        for (var i = 0; i < strArray.length; i++) {
-            var component = strArray[i];
-            if (typeof component !== 'string') {
-                throw new TypeError('Url must be a string. Received ' + component);
-            }
-            if (component === '') {
-                continue;
-            }
-            if (i > 0) {
-                // Removing the starting slashes for each component but the first.
-                component = component.replace(/^[\/]+/, '');
-            }
-            if (i < strArray.length - 1) {
-                // Removing the ending slashes for each component but the last.
-                component = component.replace(/[\/]+$/, '');
-            }
-            else {
-                // For the last component we will combine multiple slashes to a single one.
-                component = component.replace(/[\/]+$/, '/');
-            }
-            resultArray.push(component);
-        }
-        var str = resultArray.join('/');
-        // Each input component is now separated by a single slash except the possible first plain protocol part.
-        // remove trailing slash before parameters or hash
-        str = str.replace(/\/(\?|&|#[^!])/g, '$1');
-        // replace ? in parameters with &
-        var parts = str.split('?');
-        str = parts.shift() + (parts.length > 0 ? '?' : '') + parts.join('&');
-        return str;
     };
     TransactionService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
-        __metadata("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpClient"]])
+        __metadata("design:paramtypes", [_app_config__WEBPACK_IMPORTED_MODULE_2__["AppConfig"], _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpClient"]])
     ], TransactionService);
     return TransactionService;
 }());
