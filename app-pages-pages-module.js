@@ -139,7 +139,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _nebular_theme__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @nebular/theme */ "./node_modules/@nebular/theme/index.js");
 /* harmony import */ var rxjs_operators_takeWhile__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators/takeWhile */ "./node_modules/rxjs-compat/_esm5/operators/takeWhile.js");
-/* harmony import */ var _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../transaction/transaction.service */ "./src/app/transaction/transaction.service.ts");
 var __assign = (undefined && undefined.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -160,12 +159,10 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
-
 var DashboardComponent = /** @class */ (function () {
-    function DashboardComponent(themeService, transactionService) {
+    function DashboardComponent(themeService) {
         var _this = this;
         this.themeService = themeService;
-        this.transactionService = transactionService;
         this.alive = true;
         this.lightCard = {
             title: 'Light',
@@ -218,8 +215,7 @@ var DashboardComponent = /** @class */ (function () {
             styles: [__webpack_require__(/*! ./dashboard.component.scss */ "./src/app/pages/dashboard/dashboard.component.scss")],
             template: __webpack_require__(/*! ./dashboard.component.html */ "./src/app/pages/dashboard/dashboard.component.html"),
         }),
-        __metadata("design:paramtypes", [_nebular_theme__WEBPACK_IMPORTED_MODULE_1__["NbThemeService"],
-            _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_3__["TransactionService"]])
+        __metadata("design:paramtypes", [_nebular_theme__WEBPACK_IMPORTED_MODULE_1__["NbThemeService"]])
     ], DashboardComponent);
     return DashboardComponent;
 }());

@@ -1212,7 +1212,7 @@ var FooterComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"header-container\"\n     [class.left]=\"position === 'normal'\"\n     [class.right]=\"position === 'inverse'\">\n  <div class=\"logo-containter\">\n    <a (click)=\"toggleSidebar()\" href=\"#\" class=\"navigation\"><i class=\"nb-menu\"></i></a>\n    <div class=\"logo\" (click)=\"goToHome()\">Branch <span>Topology</span></div>\n  </div>\n  <!-- <ngx-theme-switcher></ngx-theme-switcher> -->\n</div>\n\n<div class=\"header-container\">\n  <!-- <ngx-layout-direction-switcher></ngx-layout-direction-switcher> -->\n  <nb-actions\n    size=\"medium\"\n    [class.right]=\"position === 'normal'\"\n    [class.left]=\"position === 'inverse'\">\n    <!-- <nb-action icon=\"nb-gear\" class=\"toggle-layout\" (click)=\"toggleSettings()\"></nb-action> -->\n    <nb-action *nbIsGranted=\"['view', 'user']\" >\n      <nb-user [nbContextMenu]=\"userMenu\" [name]=\"user?.name\" [picture]=\"user?.picture\"></nb-user>\n    </nb-action>\n    <!-- <nb-action class=\"control-item\" disabled icon=\"nb-notifications\"></nb-action> -->\n    <!-- <nb-action class=\"control-item\" icon=\"nb-email\"></nb-action> -->\n    <!-- <nb-action class=\"control-item\">\n      <nb-search type=\"rotate-layout\" (click)=\"startSearch()\"></nb-search>\n    </nb-action> -->\n  </nb-actions>\n</div>\n"
+module.exports = "<div class=\"header-container\"\n     [class.left]=\"position === 'normal'\"\n     [class.right]=\"position === 'inverse'\">\n  <div class=\"logo-containter\">\n    <a (click)=\"toggleSidebar()\" href=\"#\" class=\"navigation\"><i class=\"nb-menu\"></i></a>\n    <div class=\"logo\" (click)=\"goToHome()\">Branch <span>Topology</span></div>\n  </div>\n  <!-- <ngx-theme-switcher></ngx-theme-switcher> -->\n</div>\n\n<div class=\"header-container\">\n  <!-- <ngx-layout-direction-switcher></ngx-layout-direction-switcher> -->\n  <nb-actions\n    size=\"medium\"\n    [class.right]=\"position === 'normal'\"\n    [class.left]=\"position === 'inverse'\">\n    <!-- <nb-action icon=\"nb-gear\" class=\"toggle-layout\" (click)=\"toggleSettings()\"></nb-action> -->\n    <nb-action *nbIsGranted=\"['view', 'user']\" >\n      <nb-user [nbContextMenu]=\"userMenu\" [name]=\"user?.username\" [picture]=\"user?.avatar_url\"></nb-user>\n    </nb-action>\n    <!-- <nb-action class=\"control-item\" disabled icon=\"nb-notifications\"></nb-action> -->\n    <!-- <nb-action class=\"control-item\" icon=\"nb-email\"></nb-action> -->\n    <!-- <nb-action class=\"control-item\">\n      <nb-search type=\"rotate-layout\" (click)=\"startSearch()\"></nb-search>\n    </nb-action> -->\n  </nb-actions>\n</div>\n"
 
 /***/ }),
 
@@ -1239,8 +1239,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HeaderComponent", function() { return HeaderComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _nebular_theme__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @nebular/theme */ "./node_modules/@nebular/theme/index.js");
-/* harmony import */ var _core_data_users_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../@core/data/users.service */ "./src/app/@core/data/users.service.ts");
-/* harmony import */ var _core_utils_analytics_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../@core/utils/analytics.service */ "./src/app/@core/utils/analytics.service.ts");
+/* harmony import */ var _core_utils_analytics_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../@core/utils/analytics.service */ "./src/app/@core/utils/analytics.service.ts");
+/* harmony import */ var _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../transaction/transaction.service */ "./src/app/transaction/transaction.service.ts");
+/* harmony import */ var _app_config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../app.config */ "./src/app/app.config.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1254,19 +1255,29 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
 var HeaderComponent = /** @class */ (function () {
-    function HeaderComponent(sidebarService, menuService, userService, analyticsService) {
+    function HeaderComponent(sidebarService, menuService, config, transactionService, analyticsService) {
         this.sidebarService = sidebarService;
         this.menuService = menuService;
-        this.userService = userService;
+        this.config = config;
+        this.transactionService = transactionService;
         this.analyticsService = analyticsService;
         this.position = 'normal';
         this.userMenu = [{ title: 'Profile' }, { title: 'Log out' }];
     }
     HeaderComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.userService.getUsers()
-            .subscribe(function (users) { return _this.user = users.nick; });
+        this.config.registerOnAppConfigLoaded(function () {
+            _this.getUser();
+        });
+    };
+    HeaderComponent.prototype.getUser = function () {
+        var _this = this;
+        var accessToken = localStorage.getItem('access_token');
+        this.transactionService.getUser(accessToken).subscribe(function (user) {
+            _this.user = user;
+        });
     };
     HeaderComponent.prototype.toggleSidebar = function () {
         this.sidebarService.toggle(true, 'menu-sidebar');
@@ -1294,8 +1305,9 @@ var HeaderComponent = /** @class */ (function () {
         }),
         __metadata("design:paramtypes", [_nebular_theme__WEBPACK_IMPORTED_MODULE_1__["NbSidebarService"],
             _nebular_theme__WEBPACK_IMPORTED_MODULE_1__["NbMenuService"],
-            _core_data_users_service__WEBPACK_IMPORTED_MODULE_2__["UserService"],
-            _core_utils_analytics_service__WEBPACK_IMPORTED_MODULE_3__["AnalyticsService"]])
+            _app_config__WEBPACK_IMPORTED_MODULE_4__["AppConfig"],
+            _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_3__["TransactionService"],
+            _core_utils_analytics_service__WEBPACK_IMPORTED_MODULE_2__["AnalyticsService"]])
     ], HeaderComponent);
     return HeaderComponent;
 }());
@@ -3158,13 +3170,20 @@ var AuthGuard = /** @class */ (function () {
         this.router = router;
     }
     AuthGuard.prototype.canActivate = function (route, state) {
-        if (localStorage.getItem('currentUser')) {
-            // logged in so return true
+        if (localStorage.getItem('access_token')) {
+            // Authorized so return true
             return true;
         }
-        // not logged in so redirect to login page with the return url
+        var accessToken = this.getAccessToken();
+        if (accessToken && accessToken.length > 0) {
+            // Already get the access_token
+            localStorage.setItem('access_token', accessToken);
+            this.router.navigate([state.url]);
+            return true;
+        }
+        // Not authorized in so redirect to login page with the return url
         var extras = {
-            queryParams: { return_url: state.url, access_token: this.getAccessToken() },
+            queryParams: { return_url: state.url },
         };
         this.router.navigate(['/auth/login'], extras);
         return false;
@@ -3267,7 +3286,7 @@ var GlobalState = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!--\n<div>\n    <p>Ads for sale, <a href=\"mailto:duanqz@gmail.com\"><i class=\"fa fa-envelope-o\"></i> duanqz</a></p>\n</div>\n-->\n\n<div class=\"flex-centered\">\n    <h2 class=\"title\"> Please authorize with\n        <a href=\"http://gitlab.meizu.com\" target=\"_blank\">gitlab</a>\n    </h2>\n\n    <button class=\"btn btn-block btn-success\" (click)=\"authorize()\"> Authorize </button>\n</div>"
+module.exports = "<!--\n<div>\n    <p>Ads for sale, <a href=\"mailto:duanqz@gmail.com\"><i class=\"fa fa-envelope-o\"></i> duanqz</a></p>\n</div>\n-->\n\n<div class=\"flex-centered\">\n    <h2 class=\"title\"> Please authorize with\n        <a href=\"http://gitlab.meizu.com\" target=\"_blank\">gitlab</a>\n    </h2>\n\n    <button class=\"btn btn-block btn-success\" (click)=\"authorize()\" [disabled]=\"!configValid\"> Authorize </button>\n</div>"
 
 /***/ }),
 
@@ -3294,8 +3313,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginComponent", function() { return LoginComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../transaction/transaction.service */ "./src/app/transaction/transaction.service.ts");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
-/* harmony import */ var _app_config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../app.config */ "./src/app/app.config.ts");
+/* harmony import */ var _app_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../app.config */ "./src/app/app.config.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3308,35 +3326,19 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
-
 var LoginComponent = /** @class */ (function () {
-    function LoginComponent(config, route, router, transactionService) {
-        this.config = config;
-        this.route = route;
-        this.router = router;
-        this.transactionService = transactionService;
-        this.getUser();
-    }
-    LoginComponent.prototype.getUser = function () {
+    function LoginComponent(config, transactionService) {
         var _this = this;
-        this.route.queryParams.subscribe(function (params) {
-            var accessToken = params['access_token'];
-            var returnUrl = params['return_url'];
-            if (accessToken && accessToken.length > 0) {
-                _this.config.registerOnAppConfigLoaded(function () {
-                    _this.transactionService.getUser(accessToken).subscribe(function (user) {
-                        if (user) {
-                            localStorage.setItem('access_token', accessToken);
-                            localStorage.setItem('currentUser', user['name']);
-                            _this.router.navigate([returnUrl]);
-                        }
-                    });
-                });
-            }
+        this.config = config;
+        this.transactionService = transactionService;
+        this.config.registerOnAppConfigLoaded(function () {
+            _this.configValid = true;
         });
-    };
+    }
     LoginComponent.prototype.authorize = function () {
-        window.location.href = this.transactionService.getOauthAuthorizeUrl();
+        if (this.configValid) {
+            window.location.href = this.transactionService.getOauthAuthorizeUrl();
+        }
     };
     LoginComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -3344,9 +3346,7 @@ var LoginComponent = /** @class */ (function () {
             styles: [__webpack_require__(/*! ./login.component.scss */ "./src/app/pages/login/login.component.scss")],
             template: __webpack_require__(/*! ./login.component.html */ "./src/app/pages/login/login.component.html"),
         }),
-        __metadata("design:paramtypes", [_app_config__WEBPACK_IMPORTED_MODULE_3__["AppConfig"],
-            _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"],
-            _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"],
+        __metadata("design:paramtypes", [_app_config__WEBPACK_IMPORTED_MODULE_2__["AppConfig"],
             _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_1__["TransactionService"]])
     ], LoginComponent);
     return LoginComponent;
