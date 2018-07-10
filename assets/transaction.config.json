@@ -1,6 +1,7 @@
 {
     "gitlab": "http://gitlab.meizu.com",
     "project_id": 51,
+    "project_result_id": 1198,
     "branch": "master",
     "appid": "dace194f1483018f33666183fa2390e5bbe6a15969d6478b2d55e1c62d2cdf4e",
     "appsecret": "111df0930bbfd98c4efbce1a8c1cc1e688a04295013991556854d2e7f6dde102",
@@ -10,5 +11,7 @@
         "user": "user",
         "files": "repository/files",
         "tree": "repository/tree"
-    }
+    },
+    "defaultConfig": "flyme7",
+    "defaultRepository": "platform/frameworks/base"
 }
