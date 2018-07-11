@@ -8,23 +8,12 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./components/components.module": [
-		"./src/app/pages/components/components.module.ts",
-		"app-pages-pages-module~components-components-module",
-		"common",
-		"components-components-module"
-	],
 	"./miscellaneous/miscellaneous.module": [
 		"./src/app/pages/miscellaneous/miscellaneous.module.ts",
 		"common"
 	],
-	"./ui-features/ui-features.module": [
-		"./src/app/pages/ui-features/ui-features.module.ts",
-		"ui-features-ui-features-module"
-	],
 	"app/pages/pages.module": [
 		"./src/app/pages/pages.module.ts",
-		"app-pages-pages-module~components-components-module",
 		"common",
 		"app-pages-pages-module"
 	]
@@ -1218,6 +1207,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _nebular_theme__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @nebular/theme */ "./node_modules/@nebular/theme/index.js");
 /* harmony import */ var _core_utils_analytics_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../@core/utils/analytics.service */ "./src/app/@core/utils/analytics.service.ts");
 /* harmony import */ var _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../transaction/transaction.service */ "./src/app/transaction/transaction.service.ts");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1231,19 +1221,28 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
 var HeaderComponent = /** @class */ (function () {
-    function HeaderComponent(sidebarService, menuService, transactionService, analyticsService) {
+    function HeaderComponent(router, sidebarService, menuService, transactionService, analyticsService) {
+        this.router = router;
         this.sidebarService = sidebarService;
         this.menuService = menuService;
         this.transactionService = transactionService;
         this.analyticsService = analyticsService;
         this.position = 'normal';
-        this.userMenu = [{ title: 'Profile' }, { title: 'Log out' }];
+        this.LOGOUT = '注销';
+        this.userMenu = [{ title: this.LOGOUT }];
     }
     HeaderComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.transactionService.getUser().subscribe(function (user) {
             _this.user = user;
+        });
+        this.menuService.onItemClick().subscribe(function (data) {
+            if (data.item.title === _this.LOGOUT) {
+                localStorage.clear();
+                _this.router.navigate(['/auth/login']);
+            }
         });
     };
     HeaderComponent.prototype.toggleSidebar = function () {
@@ -1270,7 +1269,8 @@ var HeaderComponent = /** @class */ (function () {
             styles: [__webpack_require__(/*! ./header.component.scss */ "./src/app/@theme/components/header/header.component.scss")],
             template: __webpack_require__(/*! ./header.component.html */ "./src/app/@theme/components/header/header.component.html"),
         }),
-        __metadata("design:paramtypes", [_nebular_theme__WEBPACK_IMPORTED_MODULE_1__["NbSidebarService"],
+        __metadata("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_4__["Router"],
+            _nebular_theme__WEBPACK_IMPORTED_MODULE_1__["NbSidebarService"],
             _nebular_theme__WEBPACK_IMPORTED_MODULE_1__["NbMenuService"],
             _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_3__["TransactionService"],
             _core_utils_analytics_service__WEBPACK_IMPORTED_MODULE_2__["AnalyticsService"]])
