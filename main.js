@@ -1237,6 +1237,7 @@ var HeaderComponent = /** @class */ (function () {
         var _this = this;
         this.transactionService.getUser().subscribe(function (user) {
             _this.user = user;
+            localStorage.setItem('useremail', user['useremail']);
         });
         this.menuService.onItemClick().subscribe(function (data) {
             if (data.item.title === _this.LOGOUT) {
