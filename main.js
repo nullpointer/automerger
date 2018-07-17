@@ -2931,6 +2931,7 @@ var AppConfig = /** @class */ (function () {
                 projectId: String(data['project_id']) || '',
                 branch: data['branch'] || '',
                 // Oauth
+                privateToken: data['private_token'] || '',
                 appId: data['appid'] || '',
                 appSecret: data['appsecret'] || '',
                 callbackUrl: data['callback_url'] || '',
@@ -3125,6 +3126,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AuthGuard", function() { return AuthGuard; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../environments/environment */ "./src/environments/environment.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3136,11 +3138,16 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 };
 
 
+
 var AuthGuard = /** @class */ (function () {
     function AuthGuard(router) {
         this.router = router;
     }
     AuthGuard.prototype.canActivate = function (route, state) {
+        if (_environments_environment__WEBPACK_IMPORTED_MODULE_2__["environment"].mobile) {
+            // App using private token
+            return true;
+        }
         if (localStorage.getItem('access_token')) {
             // Authorized so return true
             return true;
@@ -3257,7 +3264,7 @@ var GlobalState = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!--\n<div>\n    <p>Ads for sale, <a href=\"mailto:duanqz@gmail.com\"><i class=\"fa fa-envelope-o\"></i> duanqz</a></p>\n</div>\n-->\n\n<div class=\"flex-centered\">\n    <h2 class=\"title\"> Please authorize with\n        <a href=\"http://gitlab.meizu.com\" target=\"_blank\">gitlab</a>\n    </h2>\n\n    <button class=\"btn btn-block btn-success\" (click)=\"authorize()\"> Authorize </button>\n</div>"
+module.exports = "<!--\n<div>\n    <p>Ads for sale, <a href=\"mailto:duanqz@gmail.com\"><i class=\"fa fa-envelope-o\"></i> duanqz</a></p>\n</div>\n-->\n\n<div class=\"flex-centered\">\n    <h3 class=\"title\"> Please authorize with\n        <a href=\"http://gitlab.meizu.com\">gitlab</a>\n    </h3>\n\n    <button class=\"btn btn-block btn-success\" (click)=\"authorize()\"> Authorize </button>\n</div>"
 
 /***/ }),
 
@@ -3331,14 +3338,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _theme_theme_module__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../@theme/theme.module */ "./src/app/@theme/theme.module.ts");
 /* harmony import */ var _login_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./login.component */ "./src/app/pages/login/login.component.ts");
 /* harmony import */ var _transaction_transaction_module__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../transaction/transaction.module */ "./src/app/transaction/transaction.module.ts");
-/* harmony import */ var _transaction_transaction_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../transaction/transaction.service */ "./src/app/transaction/transaction.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-
 
 
 
@@ -3355,7 +3360,7 @@ var LoginModule = /** @class */ (function () {
             declarations: [
                 _login_component__WEBPACK_IMPORTED_MODULE_2__["LoginComponent"],
             ],
-            providers: [_transaction_transaction_service__WEBPACK_IMPORTED_MODULE_4__["TransactionService"]],
+            providers: [],
         })
     ], LoginModule);
     return LoginModule;
@@ -3414,6 +3419,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
 /* harmony import */ var _app_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../app.config */ "./src/app/app.config.ts");
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../environments/environment */ "./src/environments/environment.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3426,62 +3432,64 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 
+
 var TransactionService = /** @class */ (function () {
     function TransactionService(config, http) {
         this.config = config;
         this.http = http;
-        this.transactionConfig = this.config.getTransactionConfig();
     }
     TransactionService.prototype.getDefaultConfig = function () {
-        return this.transactionConfig.defaultConfig;
+        return this.config.getTransactionConfig().defaultConfig;
     };
     TransactionService.prototype.getDefaultRepository = function () {
-        return this.transactionConfig.defaultRepository;
+        return this.config.getTransactionConfig().defaultRepository;
     };
     TransactionService.prototype.getOauthAuthorizeUrl = function () {
-        return this.transactionConfig.oauthAuthorize;
+        return this.config.getTransactionConfig().oauthAuthorize;
+    };
+    TransactionService.prototype.getPrivateToken = function () {
+        return this.config.getTransactionConfig().privateToken;
+    };
+    TransactionService.prototype.getHttpOption = function () {
+        if (_environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].mobile) {
+            var privateToken = this.config.getTransactionConfig().privateToken;
+            var httpHeaders = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]()
+                .set('Accept', 'application/json')
+                .set('Private-Token', privateToken);
+            var httpParams = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpParams"]();
+            return { headers: httpHeaders, params: httpParams };
+        }
+        if (!_environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].mobile) {
+            var accessToken = localStorage.getItem('access_token');
+            var httpHeaders = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]()
+                .set('Accept', 'application/json');
+            var httpParams = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpParams"]()
+                .set('access_token', accessToken);
+            return { headers: httpHeaders, params: httpParams };
+        }
     };
     TransactionService.prototype.getUser = function () {
-        var accessToken = localStorage.getItem('access_token');
-        var url = Object(_app_config__WEBPACK_IMPORTED_MODULE_2__["urljoin"])(this.transactionConfig.apiUser, '?access_token=' + accessToken);
-        return this.http.get(url);
+        return this.http.get(this.config.getTransactionConfig().apiUser, this.getHttpOption());
     };
     TransactionService.prototype.getConfigTree = function () {
-        var accessToken = localStorage.getItem('access_token');
-        var httpHeaders = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]()
-            .set('Accept', 'application/json');
-        var httpParams = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpParams"]()
-            .set('access_token', accessToken)
-            .set('path', 'config');
-        return this.http.get(this.transactionConfig.apiTree, { headers: httpHeaders, params: httpParams });
+        var option = this.getHttpOption();
+        option.params = option.params.set('path', 'config');
+        return this.http.get(this.config.getTransactionConfig().apiTree, option);
     };
     TransactionService.prototype.getFile = function (filepath) {
-        var accessToken = localStorage.getItem('access_token');
-        var httpHeaders = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]()
-            .set('Accept', 'application/json');
-        var httpParams = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpParams"]()
-            .set('access_token', accessToken)
-            .set('ref', this.transactionConfig.branch);
-        var url = Object(_app_config__WEBPACK_IMPORTED_MODULE_2__["urljoin"])(this.transactionConfig.apiFiles, encodeURIComponent(filepath), 'raw');
-        return this.http.get(url, { headers: httpHeaders, params: httpParams });
+        var option = this.getHttpOption();
+        option.params = option.params.set('ref', this.config.getTransactionConfig().branch);
+        var url = Object(_app_config__WEBPACK_IMPORTED_MODULE_2__["urljoin"])(this.config.getTransactionConfig().apiFiles, encodeURIComponent(filepath), 'raw');
+        return this.http.get(url, option);
     };
     TransactionService.prototype.getResultTree = function () {
-        var accessToken = localStorage.getItem('access_token');
-        var httpHeaders = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]()
-            .set('Accept', 'application/json');
-        var httpParams = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpParams"]()
-            .set('access_token', accessToken);
-        return this.http.get(this.transactionConfig.apiResultTree, { headers: httpHeaders, params: httpParams });
+        return this.http.get(this.config.getTransactionConfig().apiResultTree, this.getHttpOption());
     };
     TransactionService.prototype.getResultFile = function (filepath) {
-        var accessToken = localStorage.getItem('access_token');
-        var httpHeaders = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpHeaders"]()
-            .set('Accept', 'application/json');
-        var httpParams = new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__["HttpParams"]()
-            .set('access_token', accessToken)
-            .set('ref', this.transactionConfig.branch);
-        var url = Object(_app_config__WEBPACK_IMPORTED_MODULE_2__["urljoin"])(this.transactionConfig.apiResultFiles, encodeURIComponent(filepath), 'raw');
-        return this.http.get(url, { headers: httpHeaders, params: httpParams });
+        var option = this.getHttpOption();
+        option.params = option.params.set('ref', this.config.getTransactionConfig().branch);
+        var url = Object(_app_config__WEBPACK_IMPORTED_MODULE_2__["urljoin"])(this.config.getTransactionConfig().apiResultFiles, encodeURIComponent(filepath), 'raw');
+        return this.http.get(url, option);
     };
     TransactionService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])(),
@@ -3514,6 +3522,7 @@ __webpack_require__.r(__webpack_exports__);
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 var environment = {
+    mobile: false,
     production: false,
 };
 

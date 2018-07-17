@@ -1,11 +1,12 @@
 {
-    "gitlab": "http://gitlab.meizu.com",
+    "gitlab": "https://gitlab.meizu.com",
+    "private_token": "3XXsz9c416VBYVnbVyEg",
     "project_id": 51,
     "project_result_id": 1198,
     "branch": "master",
     "appid": "dace194f1483018f33666183fa2390e5bbe6a15969d6478b2d55e1c62d2cdf4e",
     "appsecret": "111df0930bbfd98c4efbce1a8c1cc1e688a04295013991556854d2e7f6dde102",
-    "callback_url": "http://www.nullpointer.ltd/branch-topology/",
+    "callback_url": "http://www.nullpointer.ltd/branch-topology",
     "api": {
         "version": "api/v4",
         "user": "user",
